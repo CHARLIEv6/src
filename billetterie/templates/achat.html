@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Achat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="icon" type="image/png" href="{% static 'logofav.png' %}">
+</head>
+
+<body id="offres" data-spy="scroll" data-target=".navbar" data-offset="50">
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#accueil">
+                    <img src="{% static 'logojo.png' %}" alt="Logo JO" class="logo-jo">
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'accueil' %}">ACCUEIL</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="#">BONJOUR, {{ user.username }}</a></li>
+                    <li><a href="{% url 'logout' %}">DECONNEXION <span class="glyphicon glyphicon-log-out"></span></a>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'inscription' %}">INSCRIPTION</a></li>
+                    <li><a href="{% url 'login' %}">CONNEXION</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="text-center">Achat de billet</h2>
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="post" class="form-horizontal">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nombre_billets">Nombre de billets</label>
+                {{ form.nombre_billets }}
+            </div>
+            <br>
+
+            <div class="form-group">
+                <p id="prix_total">Prix total du panier: --€</p>
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="moyen_paiement">Choisir le moyen de paiement</label>
+                <select name="moyen_paiement" class="form-control" required>
+                    <option value="">Choisir...</option>
+                    <option value="credit_card">Carte de crédit</option>
+                    <option value="paypal">PayPal</option>
+                </select>
+            </div>
+
+            <div id="details_credit_card" style="display: none;">
+                <div class="form-group">
+                    <label for="numero_carte">Numéro de carte</label>
+                    <input type="text" name="numero_carte" class="form-control" maxlength="16" pattern="\d{16}"
+                        placeholder="1234 5678 9012 3456">
+                </div>
+                <div class="form-group">
+                    <label for="expiration_carte">Date d'expiration (MM/AAAA)</label>
+                    <input type="text" name="expiration_carte" class="form-control" maxlength="7" pattern="\d{2}/\d{4}"
+                        placeholder="MM/AAAA">
+                </div>
+                <div class="form-group">
+                    <label for="cvv_carte">CVV</label>
+                    <input type="text" name="cvv_carte" class="form-control" maxlength="3" pattern="\d{3}"
+                        placeholder="123">
+                </div>
+            </div>
+            <br>
+
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Acheter</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const prixUnitaires = {
+                "Offre_Solo": 50,
+                "Offre_Duo": 90,
+                "Offre_Familiale": 160
+            };
+
+            const prixTotalElement = $("#prix_total");
+            const offre = "{{ request.GET.offre }}";
+            const prixUnitaire = prixUnitaires[offre] || 0;
+
+            $("#id_nombre_billets").on("input", function () {
+                const nombreBillets = parseInt($(this).val()) || 0;
+                const prixTotal = nombreBillets * prixUnitaire;
+                prixTotalElement.text(`Prix total du panier: ${prixTotal}€`);
+            });
+
+            $('select[name="moyen_paiement"]').change(function () {
+                if ($(this).val() === 'credit_card') {
+                    $('#details_credit_card').show();
+                } else {
+                    $('#details_credit_card').hide();
+                }
+            });
+
+            $("#id_nombre_billets").trigger("input");
+        });
+    </script>
+</body>
+
+</html>

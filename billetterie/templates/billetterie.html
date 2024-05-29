@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Billetterie</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="icon" type="image/png" href="{% static 'logofav.png' %}">
+</head>
+
+<body id="offres" data-spy="scroll" data-target=".navbar" data-offset="50">
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#accueil">
+                    <img src="{% static 'logojo.png' %}" alt="Logo JO" class="logo-jo">
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'accueil' %}">ACCUEIL</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="#">BONJOUR, {{ user.username }}</a></li>
+                    <li><a href="{% url 'logout' %}">DECONNEXION <span class="glyphicon glyphicon-log-out"></span></a>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'inscription' %}">INSCRIPTION</a></li>
+                    <li><a href="{% url 'login' %}">CONNEXION</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if not user.is_authenticated %}
+    <div class="alert alert-warning">
+        Vous devez vous connecter pour acheter des billets.
+        <a href="{% url 'login' %}">Connexion</a> ou <a href="{% url 'inscription' %}">Inscription</a>.
+    </div>
+    {% else %}
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-sm-4">
+                    <div class="thumbnail">
+                        <br>
+                        <p><strong>Offre Solo <span class="label label-success">En stock!</span></strong></p>
+                        <p><em>Idéal pour une personne !</em></p>
+                        <p>🎫 50€ / unité</p>
+                        <form method="GET" action="{% url 'achat_billet' %}">
+                            <input type="hidden" name="offre" value="Offre_Solo">
+                            <button type="submit" class="btn btn-primary">Sélectionner</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="thumbnail">
+                        <br>
+                        <p><strong>Offre Duo <span class="label label-success">En stock!</span></strong></p>
+                        <p><em>Profitez à deux !</em></p>
+                        <p>🎫 90€ / unité</p>
+                        <form method="GET" action="{% url 'achat_billet' %}">
+                            <input type="hidden" name="offre" value="Offre_Duo">
+                            <button type="submit" class="btn btn-primary">Sélectionner</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="thumbnail">
+                        <br>
+                        <p><strong>Offre Familiale <span class="label label-warning">Bientôt épuisée!</span></strong>
+                        </p>
+                        <p><em>Prévu pour une groupe de 4 !</em></p>
+                        <p>🎫 160€ / unité</p>
+                        <form method="GET" action="{% url 'achat_billet' %}">
+                            <input type="hidden" name="offre" value="Offre_Familiale">
+                            <button type="submit" class="btn btn-primary">Sélectionner</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</body>
+
+</html>
